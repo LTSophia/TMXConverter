@@ -4,50 +4,93 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Drawing;
-using static System.Net.Mime.MediaTypeNames;
 using System.Collections;
 using System.Security.Cryptography;
+using Pfim;
+using System.Reflection.Metadata;
+using System.Runtime.InteropServices;
+using System.Drawing.Imaging;
+using ImageFormat = Pfim.ImageFormat;
+using static System.Net.Mime.MediaTypeNames;
 
 namespace TMXConverter
 {
     class Program
     {
-
-        struct TMXByte
+        static char[] trimChars = {'\"', '\''};
+        
+        private static Bitmap ToBitmap(IImage image)
         {
-            internal byte alpha;
-            internal byte red;
-            internal byte green;
-            internal byte blue;
-
-            public TMXByte(Color color)
+           
+            PixelFormat format;
+            switch (image.Format)
             {
-                alpha = color.A;
-                red = color.R;
-                green = color.G;
-                blue = color.B;
+                case ImageFormat.Rgb24:
+                    format = PixelFormat.Format24bppRgb;
+                    break;
+
+                case ImageFormat.Rgba32:
+                    format = PixelFormat.Format32bppArgb;
+                    break;
+
+                case ImageFormat.R5g5b5:
+                    format = PixelFormat.Format16bppRgb555;
+                    break;
+
+                case ImageFormat.R5g6b5:
+                    format = PixelFormat.Format16bppRgb565;
+                    break;
+
+                case ImageFormat.R5g5b5a1:
+                    format = PixelFormat.Format16bppArgb1555;
+                    break;
+
+                case ImageFormat.Rgb8:
+                    format = PixelFormat.Format8bppIndexed;
+                    break;
+
+                default:
+                    var caption = "Unrecognized format";
+                    Console.Write(caption);
+                    image.Dispose();
+                    return null;
             }
+            
+            var ptr = Marshal.UnsafeAddrOfPinnedArrayElement(image.Data, 0);
+            var bitmap = new Bitmap(image.Width, image.Height, image.Stride, format, ptr);
+            image.Dispose();
+            return bitmap;
         }
         static void Main(string[] args)
         {
 
             if (args.Length == 0)
             {
-                Console.WriteLine("usage: TMXConverter imagefile(png, jpeg, bmp) [output.tmx]");
+                Console.WriteLine("usage: TMXConverter imagefile(png, jpeg, bmp or tga)");
+                Console.WriteLine("       -o -output: sets name of file output");
+                Console.WriteLine("       -u -userid: sets user id of TMX");
+                Console.WriteLine("       -c -comment: sets user ");
             }
             else
             {
                 string input = args[0];
-                string output;
-                if (args.Length >= 2)
-                    output = args[1];
-                else output = Path.ChangeExtension(input, "tmx");
+                short userID = 1;
+                string comment = "";
+                string output = Path.ChangeExtension(input, "tmx");
+                for (var i = 1; i < args.Length; i++)
+                {
+                    if (args[i].ToLower() == "-userid" || args[i] == "-u") { userID = short.Parse(args[i + 1].Trim(trimChars)); }
+                    else if (args[i].ToLower() == "-comment" || args[i] == "-c") { comment = args[i + 1].Trim(trimChars); }
+                    else if (args[i].ToLower() == "-output" || args[i] == "-o") { output = args[i + 1].Trim(trimChars); }
+                }
 
-                Bitmap image = new Bitmap(input, true);
-                Color[] tmxbyte = new Color[image.Width * image.Height];
+                if (comment.Length > 28) { comment = comment.Substring(0, 28); }
+
+                Bitmap image = (Path.GetExtension(input).ToLower() == ".tga") ? ToBitmap(Pfimage.FromFile(input)) : new Bitmap(input, true);
+                Color[] tmxbyte = new Color[(image.Width - (image.Width % 8) ) * ( image.Height - (image.Height % 2))];
                 int num = 0;
 
-                for (int y = 0; y < image.Height; y += 1)
+                for (int y = 0; y < image.Height - (image.Height % 2); y += 1)
                 {
                     for (int x = 0; x + 7 < image.Width; x += 8)
                     {
@@ -60,21 +103,21 @@ namespace TMXConverter
                         tmxbyte[num + 6] = image.GetPixel(x + 6, y);
                         tmxbyte[num + 7] = image.GetPixel(x + 7, y);
                         num += 8;
-
-
                     }
                 }
                 using (var fs = new FileStream(output, FileMode.Create, FileAccess.Write))
                 {
                     BinaryWriter bw = new BinaryWriter(fs);
-                    bw.Write(0x00010002);
+                    bw.Write((short)0x0002);
+                    bw.Write((short)userID);
                     bw.Write(64 + (4 * tmxbyte.Length));
                     bw.Write(0x30584D54); //TMX0
                     bw.Seek(6, SeekOrigin.Current);
                     bw.Write((short)(image.Width - (image.Width % 8)));
                     bw.Write((short)(image.Height - (image.Height % 2)));
                     bw.Write(0xFF0000000000);
-                    bw.Seek(34, SeekOrigin.Current);
+                    bw.Seek(6, SeekOrigin.Current);
+                    bw.Write(Encoding.ASCII.GetBytes(comment.PadRight(28, '\0')));
                     for (int i = 0; i < tmxbyte.Length; i++)
                     {
                         bw.Write((byte)((tmxbyte[i].R)));
@@ -85,6 +128,7 @@ namespace TMXConverter
                     }
 
                 }
+                
             }
             
         }
