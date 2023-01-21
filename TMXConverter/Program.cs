@@ -70,22 +70,22 @@ namespace TMXConverter
                 Console.WriteLine("usage: TMXConverter imagefile(png, jpeg, bmp or tga)");
                 Console.WriteLine("      -o -output: sets name of file output");
                 Console.WriteLine("      -u -userid: sets user id of TMX");
-                Console.WriteLine("      -c -comment: sets user ");
-                Console.WriteLine("      -s -solidify: solidifies edge of texture to remove haloing ");
+                Console.WriteLine("      -c -comment: sets user comment (defaults to filename)");
+                Console.WriteLine("      -ns -nosolidify: removes solidifying of texture edge");
             }
             else
             {
                 string input = args[0];
                 short userID = 1;
-                string comment = "";
-                bool solidify = false;
+                string comment = Path.GetFileNameWithoutExtension(input);
+                bool solidify = true;
                 string output = Path.ChangeExtension(input, "tmx");
                 for (var i = 1; i < args.Length; i++)
                 {
                     if (args[i].ToLower() == "-userid" || args[i] == "-u") { userID = short.Parse(args[i + 1].Trim(trimChars)); }
                     else if (args[i].ToLower() == "-comment" || args[i] == "-c") { comment = args[i + 1].Trim(trimChars); }
                     else if (args[i].ToLower() == "-output" || args[i] == "-o") { output = args[i + 1].Trim(trimChars); }
-                    else if (args[i].ToLower() == "-solidify" || args[i] == "-s") { solidify = true; }
+                    else if (args[i].ToLower() == "-nosolidify" || args[i] == "-ns") { solidify = false; }
                 }
                 if(!Path.Exists(input)) { Console.WriteLine("Could not find file"); return; }
                 if(Path.GetDirectoryName(output) != "" && !Path.Exists(Path.GetDirectoryName(output))) { Console.WriteLine("Output folder does not exist"); return; }
