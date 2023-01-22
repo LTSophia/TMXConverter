@@ -51,4 +51,5 @@ Turns of the solidify effect that is used to get rid of halos on transparency. I
 
 ## Testimonial
 ![Pixelguin Approved!](/Images/Testimonial.png)
+
 Check out [Pixelguin's in-depth guide](https://gamebanana.com/tuts/15675) on this tool!
