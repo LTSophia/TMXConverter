@@ -69,9 +69,10 @@ namespace TMXConverter
             {
                 Console.WriteLine("usage: TMXConverter imagefile(png, jpeg, bmp or tga)");
                 Console.WriteLine("      -o -output: sets name of file output");
-                Console.WriteLine("      -u -userid: sets user id of TMX");
+                Console.WriteLine("      -u -userid: sets user id of TMX (defaults to 1)");
                 Console.WriteLine("      -c -comment: sets user comment (defaults to filename)");
                 Console.WriteLine("      -ns -nosolidify: removes solidifying of texture edge");
+                return;
             }
             else
             {
