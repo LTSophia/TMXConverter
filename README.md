@@ -50,5 +50,5 @@ Turns of the solidify effect that is used to get rid of halos on transparency. I
 `TMXConverter.exe foobar.png -nosolidify`
 
 ## Testimonial
-![Pixelguin Approved!](\Images\Testimonial.png)
+![Pixelguin Approved!](/Images/Testimonial.png)
 Check out [Pixelguin's in-depth guide](https://gamebanana.com/tuts/15675) on this tool!
