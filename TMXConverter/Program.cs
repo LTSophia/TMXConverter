@@ -97,13 +97,14 @@ namespace TMXConverter
                 {
                     ProcessStartInfo startInfo = new ProcessStartInfo();
                     startInfo.FileName = "gmic\\gmic.exe";
-                    string newfile = Path.GetFileNameWithoutExtension(input) + "-Solidify.png";
+                    string newfile = Path.GetFileNameWithoutExtension(input).Replace(" ", "") + "-Solidify.png";
                     startInfo.Arguments = "\"" + input + "\" solidify , output " + newfile;
                     using (Process exeProcess = Process.Start(startInfo))
                     {
                         exeProcess.WaitForExit();
                     }
                     image = (Path.GetExtension(input).ToLower() == ".tga") ? ToBitmap(Pfimage.FromFile(input)) : new Bitmap(input, true);
+                    
                     Bitmap image2 = new Bitmap(newfile, true);
                     Color c;
                     for (int y = 0; y < image.Height; y += 1)
@@ -148,8 +149,9 @@ namespace TMXConverter
                     bw.Seek(6, SeekOrigin.Current);
                     bw.Write((short)(image.Width - (image.Width % 8)));
                     bw.Write((short)(image.Height - (image.Height % 2)));
-                    bw.Write(0xFF0000000000);
-                    bw.Seek(6, SeekOrigin.Current);
+                    bw.Write((short)0);
+                    bw.Write(0xFF000000);
+                    bw.Seek(8, SeekOrigin.Current);
                     bw.Write(Encoding.ASCII.GetBytes(comment.PadRight(28, '\0')));
                     for (int i = 0; i < tmxbyte.Length; i++)
                     {

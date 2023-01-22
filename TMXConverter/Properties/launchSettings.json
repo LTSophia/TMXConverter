@@ -1,0 +1,8 @@
+{
+  "profiles": {
+    "TMXConverter": {
+      "commandName": "Project",
+      "commandLineArgs": "\"Screenshot 2023-01-21 003408.png\""
+    }
+  }
+}
