@@ -44,11 +44,12 @@ Sets the User Comment of the tmx file. Basically the name that the file will sho
 `TMXConverter.exe foo.png -comment bar`
 
 ### -nosolidify:
-Turns of the solidify effect that is used to get rid of halos on transparency. If your textures do not have transparency, use this to save time taken to process each file.
+Turns off the solidify effect that is used to get rid of halos on transparency. If your textures do not have transparency, use this to save time taken to process each file.
 
 **Example:**
 `TMXConverter.exe foobar.png -nosolidify`
 
-##Testimonial
-![Pixelguin Approved!](Images\Testimonial.png)
+## Testimonial
+![Pixelguin Approved!](/Images/Testimonial.png)
+
 Check out [Pixelguin's in-depth guide](https://gamebanana.com/tuts/15675) on this tool!
