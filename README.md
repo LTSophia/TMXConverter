@@ -1,4 +1,10 @@
-# TMX Converter
+# ~~TMX Converter~~
+
+# DO NOT USE ANYMORE!
+## [TMX Blaster](https://github.com/LTSophia/TMX-Blaster) is a better converter in every way.
+
+### The rest of this readme is left unchanged
+
 TMXConverter is a program designed to convert images to TMX. 
 
 It does not currently allow you to convert files from TMX to another format.
